@@ -21,10 +21,10 @@ public class TheThing {
                 System.out.println(lol.toString());
         }
         int numRigs = stuff.data.length;
-        JLabel[][] Labels = new JLabel[numRigs][6];
-        frame.setSize(595, numRigs * 30 + 100);
+        JLabel[][] Labels = new JLabel[numRigs+1][6];
+        frame.setSize(595, numRigs * 30 + 120);
         generateLabels(frame);
-        for (int i = 0; i < numRigs; i++) {
+        for (int i = 0; i < numRigs + 1; i++) {
             Labels[i][0] = new JLabel();
             Labels[i][0].setBounds(10,40 + i*30,100,30);
             frame.add(Labels[i][0]);
@@ -51,8 +51,14 @@ public class TheThing {
         }
         frame.add(new JLabel());
         while (true) {
+            long[] totals = new long[5];
             for (int i = 0; i < numRigs; i++) {
                 RigData bar = stuff.data[i];
+                totals[0] += bar.currentHashrate;
+                totals[1] += bar.averageHashrate;
+                totals[2] += bar.validShares;
+                totals[3] += bar.staleShares;
+                totals[4] += bar.invalidShares;
                 Labels[i][0].setText(bar.worker);
                 Labels[i][1].setText(String.format("%.1f MH/s",bar.currentHashrate/1000000));
                 Labels[i][2].setText(String.format("%.1f MH/s",bar.averageHashrate/1000000));
@@ -61,6 +67,12 @@ public class TheThing {
                 Labels[i][4].setText(String.format("%d%%",(int) (100.0 * bar.staleShares / totalShares + 0.5)));
                 Labels[i][5].setText(String.format("%d min ago", (int)((System.currentTimeMillis()/1000 - bar.lastSeen)/60.0+0.5)));
             }
+            Labels[numRigs][0].setText("Total");
+            Labels[numRigs][1].setText(String.format("%.1f MH/s",(float)totals[0]/1000000));
+            Labels[numRigs][2].setText(String.format("%.1f MH/s",(float)totals[1]/1000000));
+            long totalShares = totals[2] + totals[3] + totals[4];
+            Labels[numRigs][3].setText(String.format("%d%%",(int) (100.0 * totals[2] / totalShares + 0.5)));
+            Labels[numRigs][4].setText(String.format("%d%%",(int) (100.0 * totals[3] / totalShares + 0.5)));
 
             Thread.sleep(30000);
 
